@@ -1,0 +1,33 @@
+{
+  "name": "runmeteor",
+  "version": "0.1.0",
+  "description": "Deploy Meteor Applications to Production Server",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "grunt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amalg989/runmeteor.git"
+  },
+  "keywords": [
+    "meteor",
+    "deployment",
+    "angular",
+    "angularjs",
+    "upload",
+    "production"
+  ],
+  "author": "Amal Gamage",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/amalg989/runmeteor/issues"
+  },
+  "homepage": "https://github.com/amalg989/runmeteor#readme",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "grunt": "latest",
+    "grunt-mocha": "^1.0.2",
+    "mocha": "^3.1.0"
+  }
+}
