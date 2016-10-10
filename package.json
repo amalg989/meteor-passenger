@@ -1,6 +1,6 @@
 {
   "name": "runmeteor",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Deploy Meteor Applications to Production Server",
   "main": "src/index.js",
   "bin": {
