@@ -5,10 +5,6 @@ import uuid from 'uuid';
 import * as _ from 'underscore';
 import buildApp from './build.js';
 
-export function help() {
-    console.log('mup meteor', Object.keys(this));
-}
-
 export function logs(api) {
     const config = api.getConfig().meteor;
     if (!config) {
