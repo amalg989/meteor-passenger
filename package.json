@@ -1,10 +1,14 @@
 {
   "name": "runmeteor",
-  "version": "0.1.0",
+  "version": "0.1.3",
   "description": "Deploy Meteor Applications to Production Server",
   "main": "src/index.js",
+  "bin": {
+    "runmeteor": "./index.js"
+  },
   "scripts": {
-    "test": "grunt"
+    "prepublish": "nofat make",
+    "test": "nofat test && nofat lint"
   },
   "repository": {
     "type": "git",
@@ -29,7 +33,7 @@
     "grunt": "latest",
     "grunt-mocha": "^1.0.2",
     "mocha": "^3.1.0",
-    "nofat": "1.0.x",
+    "nofat": "^1.0.3",
     "ssh2": "0.4.x"
   },
   "dependencies": {
