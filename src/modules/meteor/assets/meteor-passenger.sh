@@ -6,17 +6,22 @@ BUNDLE_PATH=$APP_PATH/current
 ENV_FILE=$APP_PATH/config/env.list
 PORT=<%= port %>
 PASSENGER_JSON_PATH=$APP_PATH/config/Passengerfile.json
+passengerLockedFile="passenger.pid"
 
 set -e
 
 # save the last known version
 cd $APP_PATH
 if [[ -d current ]]; then
-  cd $APP_PATH/deploy/bundle
-  sudo passenger stop
-  cd $APP_PATH
-  sudo rm -rf last
-  sudo mv current last
+  if [ -f "$passengerLockedFile" ]
+  then
+    cd $APP_PATH/deploy/bundle
+    sudo passenger stop
+  else
+    cd $APP_PATH
+    sudo rm -rf last
+    sudo mv current last
+  fi
 fi
 
 # setup the new version
