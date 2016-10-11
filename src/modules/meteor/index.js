@@ -1,7 +1,9 @@
 import path from 'path';
 import debug from 'debug';
 import nodemiral from 'nodemiral';
+import {runTaskList, getPassengerLogs} from '../utils';
 import uuid from 'uuid';
+var fs = require('fs');
 import * as _ from 'underscore';
 import buildApp from './build.js';
 
@@ -19,6 +21,7 @@ export function logs(api) {
 
 export function setup(api) {
     const config = api.getConfig().meteor;
+
     if (!config) {
         console.error('error: no configs found for meteor');
         process.exit(1);
@@ -74,6 +77,7 @@ export function push(api) {
     console.log('Building App Bundle Locally');
 
     var bundlePath = path.resolve(buildOptions.buildLocation, 'bundle.tar.gz');
+
     const appPath = path.resolve(api.getBasePath(), config.path);
 
     return buildApp(appPath, buildOptions)
@@ -89,40 +93,47 @@ export function push(api) {
             list.copy('Pushing Meteor App Bundle to The Server', {
                 src: bundlePath,
                 dest: '/opt/' + config.name + '/tmp/bundle.tar.gz',
-                progressBar: config.enableUploadProgressBar
+                progressBar: true
             });
 
-            var passengerJson = '{' +
-                '// Tell Passenger that this is a Meteor app.' +
-                '"app_type": "node",' +
-                '"startup_file": "main.js",' +
-                '"envvars": {' +
-                '// Tell your app where MongoDB is' +
-                '"MONGO_URL": "mongodb://localhost:27017/'+config.name+'",' +
-                '// Tell your app what its root URL is' +
-                '"ROOT_URL": "'+config.env.ROOT_URL+'",' +
+            var passengerJson = '{\n' +
+                '// Tell Passenger that this is a Meteor app.\n' +
+                '"app_type": "node",\n' +
+                '"startup_file": "main.js",\n' +
+                '"envvars": {\n' +
+                '// Tell your app where MongoDB is\n' +
+                '"MONGO_URL": "mongodb://localhost:27017/'+config.name+'",\n' +
+                '// Tell your app what its root URL is\n' +
+                '"ROOT_URL": "'+config.env.ROOT_URL+'",\n' +
                 '},' +
-                '// Store log and PID file in parent directory' +
-                '"log_file": "/opt/'+config.name+'/passenger.log",' +
-                '"pid_file": "/opt/'+config.name+'/passenger.pid"' +
-                '// Run the app in a production environment. The default value is "development".' +
-                '"environment": "production",' +
-                '// Run Passenger on port 80, the standard HTTP port.' +
-                '"port": '+(config.env.PORT || 80)+',' +
-                '// Tell Passenger to daemonize into the background.' +
-                '"daemonize": true' +
+                '// Store log and PID file in parent directory\n' +
+                '"log_file": "/opt/'+config.name+'/passenger.log",\n' +
+                '"pid_file": "/opt/'+config.name+'/passenger.pid"\n' +
+                '// Run the app in a production environment. The default value is "development".\n' +
+                '"environment": "production",\n' +
+                '// Run Passenger on port 80, the standard HTTP port.\n' +
+                '"port": '+(config.env.PORT || 80)+',\n' +
+                '// Tell Passenger to daemonize into the background.\n' +
+                '"daemonize": true\n' +
                 '}';
+
+            fs.writeFile("/tmp/passengerJson.json", passengerJson, function(err) {
+                if(err) {
+                    return console.log(err);
+                }
+
+                list.copy('Setting up Passenger Configuration', {
+                    src: "/tmp/passengerJson.json",
+                    dest: '/opt/' + config.name + '/config/Passengerfile.json',
+                    progressBar: true
+                });
+            });
 
             list.copy('Pushing the Startup Script', {
                 src: path.resolve(__dirname, 'assets/templates/start.sh'),
                 dest: '/opt/' + config.name + '/config/start.sh',
                 vars: {
-                    appName: config.name,
-                    useLocalMongo: api.getConfig().mongo ? 1 : 0,
-                    port: config.env.PORT || 80,
-                    sslConfig: config.ssl,
-                    logConfig: config.log,
-                    passengerJson: passengerJson
+                    appName: config.name
                 }
             });
 
@@ -155,6 +166,30 @@ export function envconfig(api) {
             appName: config.name
         }
     });
+    const sessions = api.getSessions([ 'meteor' ]);
+    return runTaskList(list, sessions, {series: true});
+}
+
+export function buildPassengerMeteorModule(api) {
+    const config = api.getConfig().meteor;
+    if (!config) {
+        console.error('error: no configs found for meteor');
+        process.exit(1);
+    }
+
+    const list = nodemiral.taskList('Build Meteor Module For Passenger');
+
+    list.executeScript('Build Meteor Module', {
+        script: path.resolve(__dirname, 'assets/meteor-passenger.sh'),
+        vars: {
+            appName: config.name,
+            useLocalMongo: api.getConfig().mongo ? 1 : 0,
+            port: config.env.PORT || 80,
+            sslConfig: config.ssl,
+            logConfig: config.log
+        }
+    });
+
     const sessions = api.getSessions([ 'meteor' ]);
     return runTaskList(list, sessions, {series: true});
 }
@@ -197,6 +232,7 @@ export function deploy(api) {
 
     return push(api)
         .then(() => envconfig(api))
+        .then(() => buildPassengerMeteorModule(api))
         .then(() => start(api));
 }
 

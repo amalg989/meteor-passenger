@@ -1,6 +1,6 @@
 {
-  "name": "runmeteor",
-  "version": "0.1.4",
+  "name": "meteor-passenger",
+  "version": "1.0.0",
   "description": "Deploy Meteor Applications to Production Server",
   "main": "src/index.js",
   "bin": {
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/amalg989/runmeteor.git"
+    "url": "git+https://github.com/amalg989/meteor-passenger.git"
   },
   "keywords": [
     "meteor",
@@ -25,9 +25,9 @@
   "author": "Amal Gamage",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/amalg989/runmeteor/issues"
+    "url": "https://github.com/amalg989/meteor-passenger/issues"
   },
-  "homepage": "https://github.com/amalg989/runmeteor#readme",
+  "homepage": "https://github.com/amalg989/meteor-passenger.git#readme",
   "devDependencies": {
     "chai": "^3.5.0",
     "grunt": "latest",

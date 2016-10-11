@@ -2,4 +2,5 @@
 
 APPNAME=<%= appName %>
 
-cd /opt/$APPNAME/bundle && sudo passenger stop
+cd /opt/$APPNAME/deploy/bundle
+sudo passenger stop

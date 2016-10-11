@@ -6,7 +6,7 @@ import {runTaskList} from '../utils';
 export function setup(api) {
     const list = nodemiral.taskList('Setup Passenger Open Source (Standalone)');
 
-    list.executeScript('setup passenger', {
+    list.executeScript('Setup Passenger', {
         script: path.resolve(__dirname, 'assets/passenger-setup.sh')
     });
 

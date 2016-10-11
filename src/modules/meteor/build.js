@@ -69,6 +69,7 @@ function buildMeteorApp(appPath, buildOptions, callback) {
 
 function archiveIt(buildLocation, callback) {
     callback = _.once(callback);
+    
     var bundlePath = pathResolve(buildLocation, 'bundle.tar.gz');
     var sourceDir = pathResolve(buildLocation, 'bundle');
 
