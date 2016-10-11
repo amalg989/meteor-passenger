@@ -12,6 +12,9 @@ set -e
 # save the last known version
 cd $APP_PATH
 if [[ -d current ]]; then
+  cd $APP_PATH/deploy/bundle
+  sudo passenger stop
+  cd $APP_PATH
   sudo rm -rf last
   sudo mv current last
 fi
